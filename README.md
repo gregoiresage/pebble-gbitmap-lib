@@ -9,4 +9,4 @@ Instructions for Use (2 possibilities):
 --------------------- 
 
 1. Copy gbitmap_tools.c/.h in your project
-2. Modify your wscript like in the examples and use directly the compiled library (.a)
+2. Or modify your wscript like in the examples and use directly the compiled library (.a)
