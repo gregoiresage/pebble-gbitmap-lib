@@ -1,0 +1,22 @@
+{
+  "uuid": "6401daef-2ed5-4a17-9ee3-b2cde5067835",
+  "shortName": "animation_resize",
+  "longName": "animation_resize",
+  "companyName": "Gregoire Sage",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+  },
+  "resources": {
+    "media": [
+      {
+        "type": "png",
+        "name": "IMAGE_NO_LITTER",
+        "file": "images/no_litter_crop.png"
+      }
+    ]
+  }
+}
