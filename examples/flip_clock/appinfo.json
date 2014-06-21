@@ -1,0 +1,117 @@
+{
+  "uuid": "6401daef-2ed5-4a17-9ee3-b2cde5067834",
+  "shortName": "flipclock",
+  "longName": "flipclock",
+  "companyName": "Gregoire Sage",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": true
+  },
+  "appKeys": {
+  },
+  "resources": {
+    "media": [
+      {
+        "type": "png",
+        "name": "IMAGE_0_UP",
+        "file": "images/0_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_0_DOWN",
+        "file": "images/0_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_1_UP",
+        "file": "images/1_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_1_DOWN",
+        "file": "images/1_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_2_UP",
+        "file": "images/2_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_2_DOWN",
+        "file": "images/2_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_3_UP",
+        "file": "images/3_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_3_DOWN",
+        "file": "images/3_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_4_UP",
+        "file": "images/4_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_4_DOWN",
+        "file": "images/4_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_5_UP",
+        "file": "images/5_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_5_DOWN",
+        "file": "images/5_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_6_UP",
+        "file": "images/6_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_6_DOWN",
+        "file": "images/6_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_7_UP",
+        "file": "images/7_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_7_DOWN",
+        "file": "images/7_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_8_UP",
+        "file": "images/8_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_8_DOWN",
+        "file": "images/8_down.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_9_UP",
+        "file": "images/9_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_9_DOWN",
+        "file": "images/9_down.png"
+      }
+    ]
+  }
+}
