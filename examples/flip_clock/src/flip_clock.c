@@ -31,6 +31,7 @@ static void init(void) {
     .load = window_load,
     .unload = window_unload,
   });
+  window_set_background_color(window, GColorBlack);
   window_stack_push(window, true);
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
