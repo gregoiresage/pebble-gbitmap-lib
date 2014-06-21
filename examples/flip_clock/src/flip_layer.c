@@ -32,23 +32,33 @@ const int IMAGE_RESOURCE_DOWN_IDS[NUMBER_OF_IMAGES] = {
 };
 
 static void layer_update_callback(Layer *me, GContext* ctx) {
+	graphics_context_set_stroke_color(ctx, GColorWhite);
+	// graphics_fill_rect(ctx, GRect(0,0,36,58), 0, 0);
+	graphics_context_set_compositing_mode(ctx, GCompOpAssignInverted);
 	FlipLayer* flip_layer = *(FlipLayer**)(layer_get_data(me));
 	if(flip_layer->up_image){
 		GRect bounds = flip_layer->up_image->bounds;
-		graphics_draw_bitmap_in_rect(ctx, flip_layer->up_image, (GRect) { .origin = { 0, 0 }, .size = bounds.size });
-		graphics_draw_rect(ctx, (GRect) { .origin = { 0, 0 }, .size = bounds.size });
+		graphics_draw_bitmap_in_rect(ctx, flip_layer->up_image, (GRect) { .origin = { 4, 4 }, .size = bounds.size });
 	}
 	if(flip_layer->down_image){
 		GRect bounds = flip_layer->down_image->bounds;
-		graphics_draw_bitmap_in_rect(ctx, flip_layer->down_image, (GRect) { .origin = { 0, 32 }, .size = bounds.size });
-		graphics_draw_rect(ctx, (GRect) { .origin = { 0, 32 }, .size = bounds.size });
+		graphics_draw_bitmap_in_rect(ctx, flip_layer->down_image, (GRect) { .origin = { 4, 29 }, .size = bounds.size });
 	}
 	if(flip_layer->anim_resized_image){
 		GRect bounds = flip_layer->anim_resized_image->bounds;
-		graphics_draw_bitmap_in_rect(ctx, flip_layer->anim_resized_image, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = bounds.size });
-		graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = bounds.size });
+		graphics_draw_bitmap_in_rect(ctx, flip_layer->anim_resized_image, (GRect) { .origin = { 4, flip_layer->anim_image_y }, .size = bounds.size });
+		graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { 36, bounds.size.h } });
 	}
-	graphics_fill_rect(ctx, GRect(0,31,27,2), 0, 0);
+	// graphics_context_set_fill_color(ctx, GColorBlack);
+	// graphics_draw_round_rect(ctx, rect, radius)
+	graphics_draw_round_rect(ctx, GRect(0,0,36,58), 7);
+	graphics_context_set_stroke_color(ctx, GColorWhite);
+	graphics_draw_line(ctx, GPoint(1, 28), GPoint(35, 28));
+	graphics_context_set_stroke_color(ctx, GColorBlack);
+	graphics_draw_line(ctx, GPoint(1, 29), GPoint(35, 29));
+	graphics_context_set_stroke_color(ctx, GColorWhite);
+	graphics_draw_line(ctx, GPoint(1, 30), GPoint(35, 30));
+	// graphics_fill_rect(ctx, GRect(1,28,34,3), 0, 0);
 }
 
 Layer* flip_layer_get_layer(FlipLayer *flip_layer){
@@ -66,7 +76,7 @@ void animationUpdate(struct Animation *animation, const uint32_t time_normalized
 		}
 		flip_layer->anim_resized_image = scaleBitmap(flip_layer->up_anim_image, 100, 100 - 2 * percent, flip_layer->resized_data);
 		GRect bounds = flip_layer->anim_resized_image->bounds;
-		flip_layer->anim_image_y = 31 - bounds.size.h;
+		flip_layer->anim_image_y = 29 - bounds.size.h;
 	}
 	else {
 		if(flip_layer->anim_resized_image){
@@ -74,7 +84,7 @@ void animationUpdate(struct Animation *animation, const uint32_t time_normalized
 			flip_layer->anim_resized_image = NULL;
 		}
 		flip_layer->anim_resized_image = scaleBitmap(flip_layer->down_anim_image, 100, 2 * (percent - 50), flip_layer->resized_data);
-		flip_layer->anim_image_y = 32;
+		flip_layer->anim_image_y = 29;
 	}
 
 	layer_mark_dirty(flip_layer->layer);

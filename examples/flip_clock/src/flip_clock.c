@@ -14,7 +14,7 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   for(int i=0; i<4; i++){
-    layer[i] = flip_layer_create(GRect(36 * i + 5, (168-64)/2, 27, 64));
+    layer[i] = flip_layer_create(GRect(36 * i, (168-58)/2, 36, 58));
     layer_add_child(window_layer, flip_layer_get_layer(layer[i]));
   }
 }
