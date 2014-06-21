@@ -33,7 +33,9 @@ const int IMAGE_RESOURCE_DOWN_IDS[NUMBER_OF_IMAGES] = {
 
 static void layer_update_callback(Layer *me, GContext* ctx) {
 	graphics_context_set_compositing_mode(ctx, GCompOpAssignInverted);
-	
+
+	graphics_context_set_stroke_color(ctx, GColorWhite);
+
 	FlipLayer* flip_layer = *(FlipLayer**)(layer_get_data(me));
 	GRect layer_bounds = layer_get_bounds(me);
 	if(flip_layer->up_image){
@@ -58,7 +60,7 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 		graphics_draw_bitmap_in_rect(ctx, flip_layer->anim_resized_image, (GRect) { .origin = origin, .size = bounds.size });
 		graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { layer_bounds.size.w, bounds.size.h } });
 	}
-	graphics_context_set_stroke_color(ctx, GColorWhite);
+	
 	graphics_draw_round_rect(ctx, GRect(0,0,layer_bounds.size.w,layer_bounds.size.h), 7);
 	graphics_context_set_stroke_color(ctx, GColorWhite);
 	graphics_draw_line(ctx, GPoint(1, layer_bounds.size.h/2 - 1), GPoint(layer_bounds.size.w-1, layer_bounds.size.h/2 - 1));
