@@ -32,12 +32,14 @@ const int IMAGE_RESOURCE_DOWN_IDS[NUMBER_OF_IMAGES] = {
 };
 
 static void layer_update_callback(Layer *me, GContext* ctx) {
-	graphics_context_set_compositing_mode(ctx, GCompOpAssignInverted);
-
-	graphics_context_set_stroke_color(ctx, GColorWhite);
-
 	FlipLayer* flip_layer = *(FlipLayer**)(layer_get_data(me));
 	GRect layer_bounds = layer_get_bounds(me);
+
+	graphics_context_set_fill_color(ctx, GColorWhite);
+	graphics_fill_rect(ctx, GRect(0,0,layer_bounds.size.w,layer_bounds.size.h), 7, GCornersAll);
+	graphics_context_set_stroke_color(ctx, GColorBlack);
+	graphics_draw_round_rect(ctx, GRect(0,0,layer_bounds.size.w,layer_bounds.size.h), 7);
+
 	if(flip_layer->up_image){
 		GRect bounds = flip_layer->up_image->bounds;
 		GPoint origin;
@@ -61,13 +63,8 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 		graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { layer_bounds.size.w, bounds.size.h } });
 	}
 	
-	graphics_draw_round_rect(ctx, GRect(0,0,layer_bounds.size.w,layer_bounds.size.h), 7);
-	graphics_context_set_stroke_color(ctx, GColorWhite);
-	graphics_draw_line(ctx, GPoint(1, layer_bounds.size.h/2 - 1), GPoint(layer_bounds.size.w-1, layer_bounds.size.h/2 - 1));
-	graphics_context_set_stroke_color(ctx, GColorBlack);
-	graphics_draw_line(ctx, GPoint(1, layer_bounds.size.h/2), GPoint(layer_bounds.size.w-1, layer_bounds.size.h/2));
-	graphics_context_set_stroke_color(ctx, GColorWhite);
-	graphics_draw_line(ctx, GPoint(1, layer_bounds.size.h/2 + 1), GPoint(layer_bounds.size.w-1, layer_bounds.size.h/2 + 1));
+	graphics_context_set_fill_color(ctx, GColorBlack);
+	graphics_fill_rect(ctx, GRect(0,layer_bounds.size.h/2 - 1,layer_bounds.size.w,3), 0, 0);
 }
 
 Layer* flip_layer_get_layer(FlipLayer *flip_layer){
@@ -183,6 +180,8 @@ FlipLayer* flip_layer_create(GRect frame){
 	flip_layer->current_Digit = 0;
 	flip_layer->up_image = gbitmap_create_with_resource(IMAGE_RESOURCE_UP_IDS[flip_layer->current_Digit]);
 	flip_layer->down_image = gbitmap_create_with_resource(IMAGE_RESOURCE_DOWN_IDS[flip_layer->current_Digit]);
+	flip_layer->up_anim_image = NULL;
+	flip_layer->down_anim_image = NULL;
 
 	return flip_layer;
 }
