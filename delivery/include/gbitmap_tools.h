@@ -1,3 +1,5 @@
+#pragma once
+
 #include "pebble.h"
 
 //! Creates a new resized GBitmap on the heap based on an existing GBitmap.
@@ -8,3 +10,9 @@
 //! @param resized_data A pointer to the memory where the resized bitmap content is stored
 //! @return A pointer to the GBitmap. `NULL` if the GBitmap could not be created
 GBitmap* scaleBitmap(GBitmap* src, uint8_t ratio_width_percent, uint8_t ratio_height_percent, uint8_t *resized_data);
+
+
+
+
+
+void computeMorphingBitmap(GBitmap* source, GBitmap* dest, GBitmap* result, uint8_t remainingSteps) ;
