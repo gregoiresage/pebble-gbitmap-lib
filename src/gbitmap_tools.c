@@ -36,26 +36,29 @@ static void scaleRow(uint8_t *target, uint8_t *source, int srcWidth, int tgtWidt
   } 
 }
 
-GBitmap* scaleBitmap(GBitmap* src, uint8_t ratio_width_percent, uint8_t ratio_height_percent, uint8_t *resized_data){
+GBitmap* scaleBitmap(GBitmap* src, uint8_t ratio_width_percent, uint8_t ratio_height_percent){
 
   GBitmap* tgt = NULL;
   if(ratio_width_percent <= 100 && ratio_height_percent <= 100){
-    tgt = malloc(sizeof(GBitmap));
-
-    tgt->bounds = src->bounds;
-    tgt->bounds.origin.x = 0;
-    tgt->bounds.origin.y = 0;
-    tgt->bounds.size.h = src->bounds.size.h * ratio_height_percent / 100;
-    tgt->bounds.size.w = src->bounds.size.w * ratio_width_percent / 100;
-    tgt->row_size_bytes = tgt->bounds.size.w % 32 == 0 ? tgt->bounds.size.w / 4 : 4 * (tgt->bounds.size.w / 32) + 4;
-    tgt->addr = resized_data;
-    memset(tgt->addr, 0, (tgt->bounds.size.h * tgt->row_size_bytes) * sizeof(uint8_t));
 
     int srcHeight = src->bounds.size.h;
     int srcWidth = src->bounds.size.w;
-
-    int tgtHeight = tgt->bounds.size.h;
+    int tgtHeight = srcHeight * ratio_height_percent / 100;
     int tgtWidth = srcWidth * ratio_width_percent / 100;
+    
+    tgt = gbitmap_create_blank((GSize){tgtWidth, tgtHeight});
+
+    if(tgt == NULL)
+      return NULL;
+
+    // tgt->bounds = src->bounds;
+    // tgt->bounds.origin.x = 0;
+    // tgt->bounds.origin.y = 0;
+    // tgt->bounds.size.h = src->bounds.size.h * ratio_height_percent / 100;
+    // tgt->bounds.size.w = src->bounds.size.w * ratio_width_percent / 100;
+    // tgt->row_size_bytes = tgt->bounds.size.w % 32 == 0 ? tgt->bounds.size.w / 4 : 4 * (tgt->bounds.size.w / 32) + 4;
+    // tgt->addr = resized_data;
+    // memset(tgt->addr, 0, (tgt->bounds.size.h * tgt->row_size_bytes) * sizeof(uint8_t));
 
     if(tgtHeight != 0 && tgtWidth != 0){
 

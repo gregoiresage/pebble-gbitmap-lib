@@ -82,7 +82,7 @@ void animationUpdate(struct Animation *animation, const uint32_t time_normalized
 			gbitmap_destroy(flip_layer->anim_resized_image);
 			flip_layer->anim_resized_image = NULL;
 		}
-		flip_layer->anim_resized_image = scaleBitmap(flip_layer->up_anim_image, 100, 100 - 2 * percent, flip_layer->resized_data);
+		flip_layer->anim_resized_image = scaleBitmap(flip_layer->up_anim_image, 100, 100 - 2 * percent);
 		GRect bounds = flip_layer->anim_resized_image->bounds;
 		flip_layer->anim_image_y = layer_bounds.size.h/2 - bounds.size.h;
 	}
@@ -91,7 +91,7 @@ void animationUpdate(struct Animation *animation, const uint32_t time_normalized
 			gbitmap_destroy(flip_layer->anim_resized_image);
 			flip_layer->anim_resized_image = NULL;
 		}
-		flip_layer->anim_resized_image = scaleBitmap(flip_layer->down_anim_image, 100, 2 * (percent - 50), flip_layer->resized_data);
+		flip_layer->anim_resized_image = scaleBitmap(flip_layer->down_anim_image, 100, 2 * (percent - 50));
 		flip_layer->anim_image_y = layer_bounds.size.h/2;
 	}
 
@@ -175,8 +175,6 @@ FlipLayer* flip_layer_create(GRect frame){
 	animation_set_duration(flip_layer->animation, 700);
 	animation_set_implementation(flip_layer->animation, &(flip_layer->animImpl));
 
-	flip_layer->resized_data = malloc((40* 40) * sizeof(uint8_t));
-
 	flip_layer->current_Digit = 0;
 	flip_layer->up_image = gbitmap_create_with_resource(IMAGE_RESOURCE_UP_IDS[flip_layer->current_Digit]);
 	flip_layer->down_image = gbitmap_create_with_resource(IMAGE_RESOURCE_DOWN_IDS[flip_layer->current_Digit]);
@@ -207,6 +205,5 @@ void flip_layer_destroy(FlipLayer *flip_layer){
 		animation_destroy(flip_layer->animation);
 	}
 
-	free(flip_layer->resized_data);
 	free(flip_layer);
 }

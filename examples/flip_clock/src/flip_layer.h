@@ -13,7 +13,6 @@ typedef struct {
 	GBitmap* up_anim_image;
 	GBitmap* down_anim_image;
 	GBitmap* anim_resized_image;
-	uint8_t *resized_data;
 
 	uint8_t anim_image_y;
 	bool isAnimating;

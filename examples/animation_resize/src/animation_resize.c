@@ -6,7 +6,6 @@ static Layer *layer;
 
 static GBitmap *image;
 static GBitmap *resized_image;
-static uint8_t *resized_data;
 
 static Animation* animation;
 static AnimationImplementation animImpl;
@@ -18,7 +17,7 @@ void animationUpdate(struct Animation *animation, const uint32_t time_normalized
     if(resized_image){
       gbitmap_destroy(resized_image);
     }
-    resized_image = scaleBitmap(image, percent, percent, resized_data);
+    resized_image = scaleBitmap(image, percent, percent);
     layer_mark_dirty(layer);
   }
 }
@@ -54,7 +53,6 @@ int main(void) {
 
   image = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_NO_LITTER);
   resized_image = NULL;
-  resized_data = malloc((image->bounds.size.h * image->row_size_bytes) * sizeof(uint8_t));
 
   animation = animation_create();
   animImpl.update = animationUpdate;
@@ -70,7 +68,6 @@ int main(void) {
   if(resized_image){
     gbitmap_destroy(resized_image);
   }
-  free(resized_data);
 
   window_destroy(window);
   layer_destroy(layer);
