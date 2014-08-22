@@ -185,6 +185,10 @@ FlipLayer* flip_layer_create(GRect frame){
 }
 
 void flip_layer_destroy(FlipLayer *flip_layer){
+	if(flip_layer->animation){
+		animation_unschedule(flip_layer->animation);
+		animation_destroy(flip_layer->animation);
+	}
 	layer_destroy(flip_layer->layer);
 	if(flip_layer->up_image){
 		gbitmap_destroy(flip_layer->up_image);
@@ -201,9 +205,5 @@ void flip_layer_destroy(FlipLayer *flip_layer){
 	if(flip_layer->anim_resized_image){
 		gbitmap_destroy(flip_layer->anim_resized_image);
 	}
-	if(flip_layer->animation){
-		animation_destroy(flip_layer->animation);
-	}
-
 	free(flip_layer);
 }
