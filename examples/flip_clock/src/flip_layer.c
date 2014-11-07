@@ -3,34 +3,6 @@
 #include "flip_layer.h"
 #include "gbitmap_tools.h"
 
-#define NUMBER_OF_IMAGES 10
-
-const int IMAGE_RESOURCE_UP_IDS[NUMBER_OF_IMAGES] = {
-	RESOURCE_ID_IMAGE_0_UP,
-	RESOURCE_ID_IMAGE_1_UP,
-	RESOURCE_ID_IMAGE_2_UP,
-	RESOURCE_ID_IMAGE_3_UP,
-	RESOURCE_ID_IMAGE_4_UP,
-	RESOURCE_ID_IMAGE_5_UP,
-	RESOURCE_ID_IMAGE_6_UP,
-	RESOURCE_ID_IMAGE_7_UP,
-	RESOURCE_ID_IMAGE_8_UP,
-	RESOURCE_ID_IMAGE_9_UP,
-};
-
-const int IMAGE_RESOURCE_DOWN_IDS[NUMBER_OF_IMAGES] = {
-	RESOURCE_ID_IMAGE_0_DOWN,
-	RESOURCE_ID_IMAGE_1_DOWN,
-	RESOURCE_ID_IMAGE_2_DOWN,
-	RESOURCE_ID_IMAGE_3_DOWN,
-	RESOURCE_ID_IMAGE_4_DOWN,
-	RESOURCE_ID_IMAGE_5_DOWN,
-	RESOURCE_ID_IMAGE_6_DOWN,
-	RESOURCE_ID_IMAGE_7_DOWN,
-	RESOURCE_ID_IMAGE_8_DOWN,
-	RESOURCE_ID_IMAGE_9_DOWN,
-};
-
 static void layer_update_callback(Layer *me, GContext* ctx) {
 	FlipLayer* flip_layer = *(FlipLayer**)(layer_get_data(me));
 	GRect layer_bounds = layer_get_bounds(me);
@@ -60,7 +32,7 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 		origin.x = (layer_bounds.size.w - bounds.size.w) / 2;
 		origin.y = flip_layer->anim_image_y;
 		graphics_draw_bitmap_in_rect(ctx, flip_layer->anim_resized_image, (GRect) { .origin = origin, .size = bounds.size });
-		graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { layer_bounds.size.w, bounds.size.h } });
+		// graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { layer_bounds.size.w, bounds.size.h } });
 	}
 	
 	graphics_context_set_fill_color(ctx, GColorBlack);
@@ -83,8 +55,10 @@ void animationUpdate(struct Animation *animation, const uint32_t time_normalized
 			flip_layer->anim_resized_image = NULL;
 		}
 		flip_layer->anim_resized_image = scaleBitmap(flip_layer->up_anim_image, 100, 100 - 2 * percent);
-		GRect bounds = flip_layer->anim_resized_image->bounds;
-		flip_layer->anim_image_y = layer_bounds.size.h/2 - bounds.size.h;
+		if(flip_layer->anim_resized_image){
+			GRect bounds = flip_layer->anim_resized_image->bounds;
+			flip_layer->anim_image_y = layer_bounds.size.h/2 - bounds.size.h;
+		}
 	}
 	else {
 		if(flip_layer->anim_resized_image){
@@ -113,13 +87,15 @@ static void animation_started(Animation *animation, void *data) {
 		gbitmap_destroy(flip_layer->down_anim_image);
 	}
 
-	flip_layer->up_image = gbitmap_create_with_resource(IMAGE_RESOURCE_UP_IDS[flip_layer->next_Digit]);
-	flip_layer->down_image = gbitmap_create_with_resource(IMAGE_RESOURCE_DOWN_IDS[flip_layer->current_Digit]);
-
-	flip_layer->up_anim_image = gbitmap_create_with_resource(IMAGE_RESOURCE_UP_IDS[flip_layer->current_Digit]);
-	flip_layer->down_anim_image = gbitmap_create_with_resource(IMAGE_RESOURCE_DOWN_IDS[flip_layer->next_Digit]);
-
-	layer_mark_dirty(flip_layer->layer);
+	if(flip_layer->nb_of_images > 0){
+		flip_layer->up_image = gbitmap_create_with_resource(flip_layer->up_images[flip_layer->next_Digit]);
+		flip_layer->down_image = gbitmap_create_with_resource(flip_layer->down_images[flip_layer->current_Digit]);
+	
+		flip_layer->up_anim_image = gbitmap_create_with_resource(flip_layer->up_images[flip_layer->current_Digit]);
+		flip_layer->down_anim_image = gbitmap_create_with_resource(flip_layer->down_images[flip_layer->next_Digit]);
+	
+		layer_mark_dirty(flip_layer->layer);
+	}
 }
 
 void animation_stopped(Animation *animation, bool finished, void *data) {
@@ -144,7 +120,7 @@ void animation_stopped(Animation *animation, bool finished, void *data) {
 		gbitmap_destroy(flip_layer->down_image);
 	}
 
-	flip_layer->down_image = gbitmap_create_with_resource(IMAGE_RESOURCE_DOWN_IDS[flip_layer->current_Digit]);
+	flip_layer->down_image = gbitmap_create_with_resource(flip_layer->down_images[flip_layer->current_Digit]);
 
 	flip_layer->isAnimating = false;
 
@@ -152,8 +128,8 @@ void animation_stopped(Animation *animation, bool finished, void *data) {
 }
 
 void flip_layer_animate_to(FlipLayer *flip_layer, uint8_t next_value){
-	if(!flip_layer->isAnimating && flip_layer->next_Digit != (next_value % 10)){
-		flip_layer->next_Digit = next_value % 10;
+	if(!flip_layer->isAnimating && flip_layer->next_Digit != (next_value % flip_layer->nb_of_images)){
+		flip_layer->next_Digit = next_value % flip_layer->nb_of_images;
 		animation_schedule(flip_layer->animation);
 	}
 }
@@ -176,10 +152,14 @@ FlipLayer* flip_layer_create(GRect frame){
 	animation_set_implementation(flip_layer->animation, &(flip_layer->animImpl));
 
 	flip_layer->current_Digit = 0;
-	flip_layer->up_image = gbitmap_create_with_resource(IMAGE_RESOURCE_UP_IDS[flip_layer->current_Digit]);
-	flip_layer->down_image = gbitmap_create_with_resource(IMAGE_RESOURCE_DOWN_IDS[flip_layer->current_Digit]);
+	flip_layer->up_image = NULL;
+	flip_layer->down_image = NULL;
 	flip_layer->up_anim_image = NULL;
 	flip_layer->down_anim_image = NULL;
+
+	flip_layer->up_images = NULL;
+	flip_layer->down_images = NULL;
+	flip_layer->nb_of_images = 0;
 
 	return flip_layer;
 }
@@ -206,4 +186,15 @@ void flip_layer_destroy(FlipLayer *flip_layer){
 		gbitmap_destroy(flip_layer->anim_resized_image);
 	}
 	free(flip_layer);
+}
+
+void flip_layer_set_images(FlipLayer *flip_layer, int *up_images, int *down_images, int nb_of_images){
+	flip_layer->up_images 		= up_images;
+	flip_layer->down_images 	= down_images;
+	flip_layer->nb_of_images 	= nb_of_images;
+
+	if(nb_of_images > 0){
+		flip_layer->up_image = gbitmap_create_with_resource(up_images[0]);
+		flip_layer->down_image = gbitmap_create_with_resource(down_images[0]);
+	}
 }
