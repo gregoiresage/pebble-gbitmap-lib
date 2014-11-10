@@ -42,6 +42,9 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 	
 	graphics_context_set_fill_color(ctx, GColorBlack);
 	graphics_fill_rect(ctx, GRect(0,layer_bounds.size.h/2 - 1,layer_bounds.size.w,3), 0, 0);
+
+	graphics_fill_rect(ctx, GRect(2,layer_bounds.size.h/2-4,2,9), 0, GCornersAll);
+	graphics_fill_rect(ctx, GRect(layer_bounds.size.w - 2 - 2,layer_bounds.size.h/2-4,2,9), 0, GCornersAll);
 }
 
 Layer* flip_layer_get_layer(FlipLayer *flip_layer){
@@ -153,7 +156,7 @@ FlipLayer* flip_layer_create(GRect frame){
 		.stopped = (AnimationStoppedHandler) animation_stopped,
 	}, flip_layer);
 
-	animation_set_duration(flip_layer->animation, 700);
+	animation_set_duration(flip_layer->animation, 1400);
 	animation_set_implementation(flip_layer->animation, &(flip_layer->animImpl));
 
 	flip_layer->current_Digit = 0;
