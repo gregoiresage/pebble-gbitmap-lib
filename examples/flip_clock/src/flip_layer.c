@@ -12,6 +12,8 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 	graphics_context_set_stroke_color(ctx, GColorBlack);
 	graphics_draw_round_rect(ctx, GRect(0,0,layer_bounds.size.w,layer_bounds.size.h), 7);
 
+	graphics_context_set_compositing_mode(ctx,GCompOpAnd);
+
 	if(flip_layer->up_image){
 		GRect bounds = flip_layer->up_image->bounds;
 		GPoint origin;
@@ -26,13 +28,16 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 		origin.y = layer_bounds.size.h / 2;
 		graphics_draw_bitmap_in_rect(ctx, flip_layer->down_image, (GRect) { .origin = origin, .size = bounds.size });
 	}
+
+	graphics_context_set_compositing_mode(ctx,GCompOpAssign);
+
 	if(flip_layer->anim_resized_image){
 		GRect bounds = flip_layer->anim_resized_image->bounds;
 		GPoint origin;
 		origin.x = (layer_bounds.size.w - bounds.size.w) / 2;
 		origin.y = flip_layer->anim_image_y;
 		graphics_draw_bitmap_in_rect(ctx, flip_layer->anim_resized_image, (GRect) { .origin = origin, .size = bounds.size });
-		// graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { layer_bounds.size.w, bounds.size.h } });
+		graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { layer_bounds.size.w, bounds.size.h } });
 	}
 	
 	graphics_context_set_fill_color(ctx, GColorBlack);
