@@ -3,15 +3,18 @@
   "shortName": "gbitmap-lib",
   "longName": "gbitmap-lib",
   "companyName": "Gregoire Sage",
-  "versionCode": 1,
-  "versionLabel": "0.1.0",
+  "versionCode": 2,
+  "versionLabel": "2.0",
   "watchapp": {
     "watchface": false
   },
-  "appKeys": {
-  },
+  "appKeys": {},
   "resources": {
-    "media": [
-    ]
-  }
+    "media": []
+  },
+  "targetPlatforms": [
+    "aplite",
+    "basalt"
+  ],
+  "sdkVersion": "3"
 }

@@ -4,29 +4,76 @@
 * Algorithm from http://www.compuphase.com/graphic/scale.htm and adapted for Pebble GBitmap
 */
 
-static void scaleRow(uint8_t *target, uint8_t *source, int srcWidth, int tgtWidth, int srcOrigX)
+// This is the scaling algorithm for palettized format
+// GBitmapFormat1BitPalette pixels are stored like that : 0 1 2 3 4 5 6 7   8 9 10 11 12 13 14 15 .... (1 bit = 1 pixel)
+// GBitmapFormat2BitPalette pixels are stored like that : 0 0 1 1 2 2 3 3   4 4 5 5 6 6 7 7 .... (2 bit = 1 pixel)
+// GBitmapFormat4BitPalette pixels are stored like that : 0 0 0 0 1 1 1 1   2 2 2 2 3 3 3 3 .... (4 bit = 1 pixel)
+// GBitmapFormat8Bit pixels are stored like that :        0 0 0 0 0 0 0 0   1 1 1 1 1 1 1 1 .... (8 bit = 1 pixel)
+static void scaleRow(uint8_t *target, uint8_t *source, int srcWidth, int tgtWidth, int srcOrigX, uint8_t num_bits_per_pixel)
 {
   int tgtPixels = 0;
   int intPart = srcWidth / tgtWidth;
   int fractPart = srcWidth % tgtWidth;
   int E = 0;
-  int srcIndex = srcOrigX % 8;
 
-  source += srcOrigX / 8;
+  uint8_t nb_pixels_per_byte = 8 / num_bits_per_pixel;
+  int bitIndexInByte = srcOrigX % nb_pixels_per_byte;
+
+  source += srcOrigX / nb_pixels_per_byte;
+
+  uint8_t mask = (~0) >> (8 - num_bits_per_pixel);
 
   while (tgtPixels < tgtWidth) {
-    *target  |= ((*source >> srcIndex) & 1) << (tgtPixels % 8);
-    srcIndex += intPart;
+    uint8_t srcVal = (*source >> (8 - num_bits_per_pixel * (1 + bitIndexInByte))) & mask;
+    *target  |= srcVal << (8 - num_bits_per_pixel * (1 + tgtPixels % nb_pixels_per_byte));
+
+    bitIndexInByte += intPart;
     
     E += fractPart;
     if (E >= tgtWidth) {
       E -= tgtWidth;
-      srcIndex++;
+      bitIndexInByte ++;
     } 
 
-    if(srcIndex >= 8){
-      source += srcIndex / 8;
-      srcIndex = srcIndex % 8;
+    if(bitIndexInByte >= nb_pixels_per_byte){
+      source += bitIndexInByte / nb_pixels_per_byte;
+      bitIndexInByte = bitIndexInByte % nb_pixels_per_byte;
+    }
+
+    tgtPixels++;
+    if((tgtPixels * num_bits_per_pixel) % 8 == 0){
+     target++;
+    }
+  } 
+}
+
+// This is the scaling algorithm for PBI format (1 bit = 1 pixel)
+// Pixels are stored like that : 7 6 5 4 3 2 1 0  15 14 13 12 11 10 9 8 ....
+static void scaleRowPBI(uint8_t *target, uint8_t *source, int srcWidth, int tgtWidth, int srcOrigX)
+{
+  int tgtPixels = 0;
+  int intPart = srcWidth / tgtWidth;
+  int fractPart = srcWidth % tgtWidth;
+  int E = 0;
+
+  int bitIndexInByte = srcOrigX % 8;
+
+  source += srcOrigX / 8;
+
+  while (tgtPixels < tgtWidth) {
+    *target  |= ((*source >> bitIndexInByte) & 1) << tgtPixels % 8;
+
+    bitIndexInByte += intPart;
+    
+    E += fractPart;
+    if (E >= tgtWidth) {
+      E -= tgtWidth;
+      bitIndexInByte ++;
+    } 
+
+    if(bitIndexInByte >= 8){
+      source += bitIndexInByte / 8;
+      bitIndexInByte = bitIndexInByte % 8;
     }
 
     tgtPixels++;
@@ -36,47 +83,91 @@ static void scaleRow(uint8_t *target, uint8_t *source, int srcWidth, int tgtWidt
   } 
 }
 
+#ifdef PBL_SDK_3
+static uint8_t getNumColorsForFormat(GBitmapFormat format){
+  switch (format) {
+    case GBitmapFormat1BitPalette:  return 2;
+    case GBitmapFormat2BitPalette:  return 4;
+    case GBitmapFormat4BitPalette:  return 16;      
+    default: return 0;
+  }
+}
+
+static uint8_t getNumBitsPerPixelForFormat(GBitmapFormat format){
+  switch (format) {
+    case GBitmapFormat1Bit: 
+    case GBitmapFormat1BitPalette: return 1;
+    case GBitmapFormat2BitPalette: return 2;
+    case GBitmapFormat4BitPalette: return 4;
+    case GBitmapFormat8Bit:        return 8;
+    default: return 0;
+  }
+}
+#endif 
+
 GBitmap* scaleBitmap(GBitmap* src, uint8_t ratio_width_percent, uint8_t ratio_height_percent){
 
   GBitmap* tgt = NULL;
   if(ratio_width_percent <= 100 && ratio_height_percent <= 100){
 
-    int srcHeight = src->bounds.size.h;
-    int srcWidth = src->bounds.size.w;
+    GRect src_bounds = gbitmap_get_bounds(src);
+    uint16_t src_bytes_per_row = gbitmap_get_bytes_per_row(src);
+
+    int srcHeight = src_bounds.size.h;
+    int srcWidth = src_bounds.size.w;
     int tgtHeight = srcHeight * ratio_height_percent / 100;
     int tgtWidth = srcWidth * ratio_width_percent / 100;
-    
-    tgt = gbitmap_create_blank((GSize){tgtWidth, tgtHeight});
+
+#ifdef PBL_SDK_2
+    tgt = __gbitmap_create_blank((GSize){tgtWidth, tgtHeight});
+#elif defined(PBL_SDK_3)
+    GColor *palette = gbitmap_get_palette(src);
+    GBitmapFormat format = gbitmap_get_format(src);
+    uint8_t num_colors = getNumColorsForFormat(format);
+    GColor *palette_copy = NULL;
+    if(num_colors > 0){
+      palette_copy = malloc(sizeof(GColor) * num_colors);
+      memcpy(palette_copy, palette, sizeof(GColor) * num_colors);
+    }
+    tgt = gbitmap_create_blank_with_palette((GSize){tgtWidth, tgtHeight}, format, palette_copy, true);
+#endif 
 
     if(tgt == NULL)
       return NULL;
 
-    // tgt->bounds = src->bounds;
-    // tgt->bounds.origin.x = 0;
-    // tgt->bounds.origin.y = 0;
-    // tgt->bounds.size.h = src->bounds.size.h * ratio_height_percent / 100;
-    // tgt->bounds.size.w = src->bounds.size.w * ratio_width_percent / 100;
-    // tgt->row_size_bytes = tgt->bounds.size.w % 32 == 0 ? tgt->bounds.size.w / 4 : 4 * (tgt->bounds.size.w / 32) + 4;
-    // tgt->addr = resized_data;
-    // memset(tgt->addr, 0, (tgt->bounds.size.h * tgt->row_size_bytes) * sizeof(uint8_t));
+    uint16_t target_bytes_per_row = gbitmap_get_bytes_per_row(tgt);
+#ifdef PBL_SDK_3
+    uint8_t num_bits_per_pixel = 1;
+    num_bits_per_pixel = getNumBitsPerPixelForFormat(format);
+#endif
 
     if(tgtHeight != 0 && tgtWidth != 0){
 
       int NumPixels = tgtHeight;
-      int intPart = (srcHeight / tgtHeight) * src->row_size_bytes;
+      int intPart = (srcHeight / tgtHeight) * src_bytes_per_row;
       int fractPart = srcHeight % tgtHeight;
       int E = 0;
-      uint8_t *source = src->addr + src->bounds.origin.y * src->row_size_bytes;
-      uint8_t *target = tgt->addr;
+      uint8_t *source = gbitmap_get_data(src) + src_bounds.origin.y * src_bytes_per_row;
+      uint8_t *target = gbitmap_get_data(tgt);
 
       while (NumPixels-- > 0) {
-        scaleRow(target, source, srcWidth, tgtWidth, src->bounds.origin.x);
-        target += tgt->row_size_bytes;
+#ifdef PBL_SDK_2
+        scaleRowPBI(target, source, srcWidth, tgtWidth, src_bounds.origin.x);
+#else 
+        if(format == GBitmapFormat1Bit){
+          scaleRowPBI(target, source, srcWidth, tgtWidth, src_bounds.origin.x);
+        }
+        else {
+          scaleRow(target, source, srcWidth, tgtWidth, src_bounds.origin.x, num_bits_per_pixel);
+        }
+        
+#endif
+        target += target_bytes_per_row;
         source += intPart;
         E += fractPart;
         if (E >= tgtHeight) {
           E -= tgtHeight;
-          source += src->row_size_bytes;;
+          source += src_bytes_per_row;
         } 
       } 
     }
@@ -86,8 +177,7 @@ GBitmap* scaleBitmap(GBitmap* src, uint8_t ratio_width_percent, uint8_t ratio_he
 }
 
 
-
-
+#ifdef PBL_SDK_2
 
 #define setBlackPixel(bmp, x, y) ((((uint8_t *)bmp->addr)[(y) * bmp->row_size_bytes + (x) / 8] &= ~(0x01 << ((x)%8))))
 #define setWhitePixel(bmp, x, y) ((((uint8_t *)bmp->addr)[y * bmp->row_size_bytes + x / 8] |= (0x01 << (x%8))))
@@ -181,3 +271,5 @@ void computeMorphingBitmap(GBitmap* source, GBitmap* dest, GBitmap* result, uint
     }
   }
 }
+
+#endif
