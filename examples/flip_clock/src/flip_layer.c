@@ -12,7 +12,7 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 	graphics_context_set_stroke_color(ctx, GColorBlack);
 	graphics_draw_round_rect(ctx, layer_bounds, 7);
 
-	graphics_context_set_compositing_mode(ctx,GCompOpSet);
+	// graphics_context_set_compositing_mode(ctx,GCompOpSet);
 
 	if(flip_layer->up_image){
 		GRect bounds = gbitmap_get_bounds(flip_layer->up_image);
