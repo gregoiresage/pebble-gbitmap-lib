@@ -8,34 +8,35 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 	GRect layer_bounds = layer_get_bounds(me);
 
 	graphics_context_set_fill_color(ctx, GColorWhite);
-	graphics_fill_rect(ctx, GRect(0,0,layer_bounds.size.w,layer_bounds.size.h), 7, GCornersAll);
+	graphics_fill_rect(ctx, layer_bounds, 7, GCornersAll);
 	graphics_context_set_stroke_color(ctx, GColorBlack);
-	graphics_draw_round_rect(ctx, GRect(0,0,layer_bounds.size.w,layer_bounds.size.h), 7);
+	graphics_draw_round_rect(ctx, layer_bounds, 7);
 
-	graphics_context_set_compositing_mode(ctx,GCompOpAnd);
+	graphics_context_set_compositing_mode(ctx,GCompOpSet);
 
 	if(flip_layer->up_image){
-		GRect bounds = flip_layer->up_image->bounds;
+		GRect bounds = gbitmap_get_bounds(flip_layer->up_image);
 		GPoint origin;
 		origin.x = (layer_bounds.size.w - bounds.size.w) / 2;
 		origin.y = (layer_bounds.size.h - 2*bounds.size.h) / 2;
 		graphics_draw_bitmap_in_rect(ctx, flip_layer->up_image, (GRect) { .origin = origin, .size = bounds.size });
 	}
 	if(flip_layer->down_image){
-		GRect bounds = flip_layer->down_image->bounds;
+		GRect bounds = gbitmap_get_bounds(flip_layer->down_image);
 		GPoint origin;
 		origin.x = (layer_bounds.size.w - bounds.size.w) / 2;
 		origin.y = layer_bounds.size.h / 2;
 		graphics_draw_bitmap_in_rect(ctx, flip_layer->down_image, (GRect) { .origin = origin, .size = bounds.size });
 	}
 
-	graphics_context_set_compositing_mode(ctx,GCompOpAssign);
+	// graphics_context_set_compositing_mode(ctx,GCompOpAssign);
 
 	if(flip_layer->anim_resized_image){
-		GRect bounds = flip_layer->anim_resized_image->bounds;
+		GRect bounds = gbitmap_get_bounds(flip_layer->anim_resized_image);
 		GPoint origin;
 		origin.x = (layer_bounds.size.w - bounds.size.w) / 2;
 		origin.y = flip_layer->anim_image_y;
+		graphics_fill_rect(ctx, (GRect) { .origin = origin, .size = bounds.size }, 0, GCornersAll);
 		graphics_draw_bitmap_in_rect(ctx, flip_layer->anim_resized_image, (GRect) { .origin = origin, .size = bounds.size });
 		graphics_draw_rect(ctx, (GRect) { .origin = { 0, flip_layer->anim_image_y }, .size = { layer_bounds.size.w, bounds.size.h } });
 	}
@@ -51,12 +52,16 @@ Layer* flip_layer_get_layer(FlipLayer *flip_layer){
 	return flip_layer->layer;
 }
 
-void animationUpdate(struct Animation *animation, const uint32_t time_normalized){
+#ifdef PBL_COLOR
+static void animationUpdate(Animation *animation, const AnimationProgress progress) {
+#else
+static void animationUpdate(Animation *animation, const uint32_t progress) {
+#endif
 	FlipLayer *flip_layer = (FlipLayer *)animation_get_context(animation);
 
 	GRect layer_bounds = layer_get_bounds(flip_layer->layer);
 
-	int percent = time_normalized * 100 / ANIMATION_NORMALIZED_MAX;
+	int percent = progress * 100 / ANIMATION_NORMALIZED_MAX;
 	if(percent < 50){
 		if(flip_layer->anim_resized_image){
 			gbitmap_destroy(flip_layer->anim_resized_image);
@@ -64,7 +69,7 @@ void animationUpdate(struct Animation *animation, const uint32_t time_normalized
 		}
 		flip_layer->anim_resized_image = scaleBitmap(flip_layer->up_anim_image, 100, 100 - 2 * percent);
 		if(flip_layer->anim_resized_image){
-			GRect bounds = flip_layer->anim_resized_image->bounds;
+			GRect bounds = gbitmap_get_bounds(flip_layer->anim_resized_image);
 			flip_layer->anim_image_y = layer_bounds.size.h/2 - bounds.size.h;
 		}
 	}
@@ -111,6 +116,8 @@ void animation_stopped(Animation *animation, bool finished, void *data) {
 	flip_layer->current_Digit = flip_layer->next_Digit;
 
 	if(flip_layer->anim_resized_image){
+		gbitmap_destroy(flip_layer->anim_resized_image);
+		flip_layer->anim_resized_image = NULL;
 	}
 	if(flip_layer->up_anim_image){
 		gbitmap_destroy(flip_layer->up_anim_image);
@@ -150,14 +157,15 @@ FlipLayer* flip_layer_create(GRect frame){
 	memcpy(layer_get_data(flip_layer->layer), &flip_layer, sizeof(FlipLayer*));
 
 	flip_layer->animation = animation_create();
-	flip_layer->animImpl.update = animationUpdate;
+	static const AnimationImplementation implementation = {
+	  .update = animationUpdate
+	};
 	animation_set_handlers(flip_layer->animation, (AnimationHandlers) {
 		.started = (AnimationStartedHandler) animation_started,
 		.stopped = (AnimationStoppedHandler) animation_stopped,
 	}, flip_layer);
-
 	animation_set_duration(flip_layer->animation, 1400);
-	animation_set_implementation(flip_layer->animation, &(flip_layer->animImpl));
+	animation_set_implementation(flip_layer->animation, &implementation);
 
 	flip_layer->current_Digit = 0;
 	flip_layer->up_image = NULL;
@@ -175,7 +183,7 @@ FlipLayer* flip_layer_create(GRect frame){
 void flip_layer_destroy(FlipLayer *flip_layer){
 	if(flip_layer->animation){
 		animation_unschedule(flip_layer->animation);
-		animation_destroy(flip_layer->animation);
+		// animation_destroy(flip_layer->animation);
 	}
 	layer_destroy(flip_layer->layer);
 	if(flip_layer->up_image){

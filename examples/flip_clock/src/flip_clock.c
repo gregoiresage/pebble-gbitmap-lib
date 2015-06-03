@@ -75,7 +75,15 @@ static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   flip_layer_animate_to(layer_number[4], tick_time->tm_min / 10);
   flip_layer_animate_to(layer_number[5], tick_time->tm_min % 10);
 
-  flip_layer_animate_to(layer_month, tick_time->tm_mon);
+  // flip_layer_animate_to(layer_month, tick_time->tm_mon);
+}
+
+static void window_appear(Window *window) {
+  for(int i=0; i<LAYER_NUMBER; i++){
+    flip_layer_set_images(layer_number[i], NUMBER_IMAGE_RESOURCE_UP_IDS, NUMBER_IMAGE_RESOURCE_DOWN_IDS, NUMBER_IMAGE_COUNT);
+  }
+  flip_layer_set_images(layer_month, MONTH_IMAGE_RESOURCE_UP_IDS, MONTH_IMAGE_RESOURCE_DOWN_IDS, MONTH_IMAGE_COUNT);
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
 }
 
 static void window_load(Window *window) {
@@ -87,31 +95,33 @@ static void window_load(Window *window) {
     layer_number[i] = flip_layer_create(GRect(144/4 * (i-2), 168/2 + 2, 144/4, 168/2 - 2));
   }
   for(int i=0; i<LAYER_NUMBER; i++){
-    flip_layer_set_images(layer_number[i], NUMBER_IMAGE_RESOURCE_UP_IDS, NUMBER_IMAGE_RESOURCE_DOWN_IDS, NUMBER_IMAGE_COUNT);
+    // flip_layer_set_images(layer_number[i], NUMBER_IMAGE_RESOURCE_UP_IDS, NUMBER_IMAGE_RESOURCE_DOWN_IDS, NUMBER_IMAGE_COUNT);
     layer_add_child(window_layer, flip_layer_get_layer(layer_number[i]));
   }
   layer_month = flip_layer_create(GRect(144/2, 0, 144/2, 168/2 - 2)); 
-  flip_layer_set_images(layer_month, MONTH_IMAGE_RESOURCE_UP_IDS, MONTH_IMAGE_RESOURCE_DOWN_IDS, MONTH_IMAGE_COUNT);
+  // flip_layer_set_images(layer_month, MONTH_IMAGE_RESOURCE_UP_IDS, MONTH_IMAGE_RESOURCE_DOWN_IDS, MONTH_IMAGE_COUNT);
   layer_add_child(window_layer, flip_layer_get_layer(layer_month));
+  APP_LOG(0,"window_load");
 }
 
 static void window_unload(Window *window) {
-  for(int i=0; i<LAYER_NUMBER; i++){
-    flip_layer_destroy(layer_number[i]);
-  }
-  flip_layer_destroy(layer_month);
+  // for(int i=0; i<LAYER_NUMBER; i++){
+  //   flip_layer_destroy(layer_number[i]);
+  // }
+  // flip_layer_destroy(layer_month);
 }
 
 static void init(void) {
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
+    .appear = window_appear,
     .unload = window_unload,
   });
   window_set_background_color(window, GColorBlack);
   window_stack_push(window, true);
 
-  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+  
 }
 
 static void deinit(void) {

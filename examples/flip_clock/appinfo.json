@@ -8,8 +8,7 @@
   "watchapp": {
     "watchface": true
   },
-  "appKeys": {
-  },
+  "appKeys": {},
   "resources": {
     "media": [
       {
@@ -112,7 +111,6 @@
         "name": "IMAGE_9_DOWN",
         "file": "images/9_down.png"
       },
-
       {
         "type": "png",
         "name": "IMAGE_JAN_UP",
@@ -233,8 +231,10 @@
         "name": "IMAGE_DEC_DOWN",
         "file": "images/dec_down.png"
       }
-
-
     ]
-  }
+  },
+  "targetPlatforms": [
+    "basalt"
+  ],
+  "sdkVersion": "3"
 }
