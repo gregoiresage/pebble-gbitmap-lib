@@ -21,7 +21,7 @@ static void scaleRow(uint8_t *target, uint8_t *source, int srcWidth, int tgtWidt
 
   source += srcOrigX / nb_pixels_per_byte;
 
-  uint8_t mask = (~0) >> (8 - num_bits_per_pixel);
+  uint8_t mask = ((~0) & 0xFF) >> (8 - num_bits_per_pixel);
 
   while (tgtPixels < tgtWidth) {
     uint8_t srcVal = (*source >> (8 - num_bits_per_pixel * (1 + bitIndexInByte))) & mask;
