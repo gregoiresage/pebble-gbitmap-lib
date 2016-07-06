@@ -1,7 +1,7 @@
 #include <pebble.h>
 
 #include "flip_layer.h"
-#include "gbitmap_tools.h"
+#include <pebble-gbitmap-lib/gbitmap_tools.h>
 
 static void layer_update_callback(Layer *me, GContext* ctx) {
 	FlipLayer* flip_layer = *(FlipLayer**)(layer_get_data(me));
@@ -12,7 +12,7 @@ static void layer_update_callback(Layer *me, GContext* ctx) {
 	graphics_context_set_stroke_color(ctx, GColorBlack);
 	graphics_draw_round_rect(ctx, layer_bounds, 7);
 
-	// graphics_context_set_compositing_mode(ctx,GCompOpSet);
+	graphics_context_set_compositing_mode(ctx,GCompOpAssign);
 
 	if(flip_layer->up_image){
 		GRect bounds = gbitmap_get_bounds(flip_layer->up_image);
@@ -52,11 +52,7 @@ Layer* flip_layer_get_layer(FlipLayer *flip_layer){
 	return flip_layer->layer;
 }
 
-#ifdef PBL_COLOR
 static void animationUpdate(Animation *animation, const AnimationProgress progress) {
-#else
-static void animationUpdate(Animation *animation, const uint32_t progress) {
-#endif
 	FlipLayer *flip_layer = (FlipLayer *)animation_get_context(animation);
 
 	GRect layer_bounds = layer_get_bounds(flip_layer->layer);

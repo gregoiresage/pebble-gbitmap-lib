@@ -1,12 +1,10 @@
 #include <pebble.h>
 #include "flip_layer.h"
-#include "autoconfig.h"
 
 static Window *window;
 #define LAYER_NUMBER 6
 static FlipLayer *layer_number[LAYER_NUMBER];
 static FlipLayer *layer_month;
-static InverterLayer *inverter_layer;
 
 #define NUMBER_IMAGE_COUNT 10
 
@@ -70,14 +68,16 @@ int MONTH_IMAGE_RESOURCE_DOWN_IDS[MONTH_IMAGE_COUNT] = {
 
 
 static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
+  uint8_t hours = clock_is_24h_style() ? tick_time->tm_hour : tick_time->tm_hour % 12;
+  hours = !clock_is_24h_style() && hours == 0 ? 12 : hours;
   flip_layer_animate_to(layer_number[0], tick_time->tm_mday / 10);
   flip_layer_animate_to(layer_number[1], tick_time->tm_mday % 10);
-  flip_layer_animate_to(layer_number[2], tick_time->tm_hour / 10);
-  flip_layer_animate_to(layer_number[3], tick_time->tm_hour % 10);
+  flip_layer_animate_to(layer_number[2], hours / 10);
+  flip_layer_animate_to(layer_number[3], hours % 10);
   flip_layer_animate_to(layer_number[4], tick_time->tm_min / 10);
   flip_layer_animate_to(layer_number[5], tick_time->tm_min % 10);
 
-  // flip_layer_animate_to(layer_month, tick_time->tm_mon);
+  flip_layer_animate_to(layer_month, tick_time->tm_mon);
 }
 
 static void window_appear(Window *window) {
@@ -86,12 +86,6 @@ static void window_appear(Window *window) {
   }
   flip_layer_set_images(layer_month, MONTH_IMAGE_RESOURCE_UP_IDS, MONTH_IMAGE_RESOURCE_DOWN_IDS, MONTH_IMAGE_COUNT);
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
-}
-
-static void cb_in_received_handler(DictionaryIterator *iter, void *context) {
-  autoconfig_in_received_handler(iter, context);
-
-  layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInverted()); 
 }
 
 static void window_load(Window *window) {
@@ -109,21 +103,16 @@ static void window_load(Window *window) {
   layer_month = flip_layer_create(GRect(144/2, 0, 144/2, 168/2 - 2)); 
   // flip_layer_set_images(layer_month, MONTH_IMAGE_RESOURCE_UP_IDS, MONTH_IMAGE_RESOURCE_DOWN_IDS, MONTH_IMAGE_COUNT);
   layer_add_child(window_layer, flip_layer_get_layer(layer_month));
-
-  inverter_layer = inverter_layer_create(GRect(0, 0, 144, 168));
-  layer_add_child(window_layer, inverter_layer_get_layer(inverter_layer));
-  layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInverted());
 }
 
 static void window_unload(Window *window) {
-  // for(int i=0; i<LAYER_NUMBER; i++){
-  //   flip_layer_destroy(layer_number[i]);
-  // }
-  // flip_layer_destroy(layer_month);
+  for(int i=0; i<LAYER_NUMBER; i++){
+    flip_layer_destroy(layer_number[i]);
+  }
+  flip_layer_destroy(layer_month);
 }
 
 static void init(void) {
-  autoconfig_init();
 
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
@@ -134,15 +123,11 @@ static void init(void) {
   window_set_background_color(window, GColorBlack);
   window_stack_push(window, true);
 
-  app_message_register_inbox_received(cb_in_received_handler);
-
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
 }
 
 static void deinit(void) {
-  inverter_layer_destroy(inverter_layer);
   window_destroy(window);
-  autoconfig_deinit();
 }
 
 int main(void) {

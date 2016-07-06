@@ -1,0 +1,61 @@
+{
+  "version": "2.0.0",
+  "author": "Gregoire Sage",
+  "private": true,
+  "dependencies": {
+    "pebble-gbitmap-lib": "../.."
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_CAT_PBI",
+          "file": "images/jeu_nyan-cat-fly.png",
+          "memoryFormat": "1Bit"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_CAT_1",
+          "file": "images/jeu_nyan-cat-fly_bw.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_CAT_2",
+          "file": "images/jeu_nyan-cat-fly_4.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_CAT_4",
+          "file": "images/jeu_nyan-cat-fly_16.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_CAT_8",
+          "file": "images/jeu_nyan-cat-fly.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "6401daef-2ed5-4a17-9ee3-b2cde5067835",
+    "messageKeys": {},
+    "enableMultiJS": false,
+    "displayName": "animation_resize",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": false
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk"
+    ],
+    "capabilities": []
+  },
+  "name": "animation_resize"
+}
