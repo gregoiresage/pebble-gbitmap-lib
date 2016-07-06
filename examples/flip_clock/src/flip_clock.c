@@ -1,10 +1,12 @@
 #include <pebble.h>
 #include "flip_layer.h"
+#include "autoconfig.h"
 
 static Window *window;
 #define LAYER_NUMBER 6
 static FlipLayer *layer_number[LAYER_NUMBER];
 static FlipLayer *layer_month;
+static InverterLayer *inverter_layer;
 
 #define NUMBER_IMAGE_COUNT 10
 
@@ -86,6 +88,12 @@ static void window_appear(Window *window) {
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
 }
 
+static void cb_in_received_handler(DictionaryIterator *iter, void *context) {
+  autoconfig_in_received_handler(iter, context);
+
+  layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInverted()); 
+}
+
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   for(int i=0; i<2; i++){
@@ -101,7 +109,10 @@ static void window_load(Window *window) {
   layer_month = flip_layer_create(GRect(144/2, 0, 144/2, 168/2 - 2)); 
   // flip_layer_set_images(layer_month, MONTH_IMAGE_RESOURCE_UP_IDS, MONTH_IMAGE_RESOURCE_DOWN_IDS, MONTH_IMAGE_COUNT);
   layer_add_child(window_layer, flip_layer_get_layer(layer_month));
-  APP_LOG(0,"window_load");
+
+  inverter_layer = inverter_layer_create(GRect(0, 0, 144, 168));
+  layer_add_child(window_layer, inverter_layer_get_layer(inverter_layer));
+  layer_set_hidden(inverter_layer_get_layer(inverter_layer),!getInverted());
 }
 
 static void window_unload(Window *window) {
@@ -112,6 +123,8 @@ static void window_unload(Window *window) {
 }
 
 static void init(void) {
+  autoconfig_init();
+
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
@@ -121,11 +134,15 @@ static void init(void) {
   window_set_background_color(window, GColorBlack);
   window_stack_push(window, true);
 
-  
+  app_message_register_inbox_received(cb_in_received_handler);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
 }
 
 static void deinit(void) {
+  inverter_layer_destroy(inverter_layer);
   window_destroy(window);
+  autoconfig_deinit();
 }
 
 int main(void) {

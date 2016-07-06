@@ -1,39 +1,48 @@
-
 #
 # This file is the default set of rules to compile a Pebble project.
 #
 # Feel free to customize this to your needs.
 #
-
-import os.path
+import os
+import shutil
+import waflib
 
 top = '.'
 out = 'build'
 
+
+def distclean(ctx):
+    if os.path.exists('dist.zip'):
+        os.remove('dist.zip')
+    if os.path.exists('dist'):
+        shutil.rmtree('dist')
+    waflib.Scripting.distclean(ctx)
+
+
 def options(ctx):
-    ctx.load('pebble_sdk')
+    ctx.load('pebble_sdk_lib')
+
 
 def configure(ctx):
-    ctx.load('pebble_sdk')
+    ctx.load('pebble_sdk_lib')
+
 
 def build(ctx):
-    ctx.load('pebble_sdk')
+    ctx.load('pebble_sdk_lib')
 
-    build_worker = os.path.exists('worker_src')
-    binaries = []
-
-    for p in ctx.env.TARGET_PLATFORMS:
-        ctx.set_env(ctx.all_envs[p])
+    cached_env = ctx.env
+    for platform in ctx.env.TARGET_PLATFORMS:
+        ctx.env = ctx.all_envs[platform]
         ctx.set_group(ctx.env.PLATFORM_NAME)
-        app_elf='{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
-        ctx.pbl_program(source=ctx.path.ant_glob('src/**/*.c'),
-        target=app_elf)
+        lib_name = '{}/{}'.format(ctx.env.BUILD_DIR, ctx.env.PROJECT_INFO['name'])
+        ctx.pbl_build(source=ctx.path.ant_glob('src/c/**/*.c'), target=lib_name, bin_type='lib')
+    ctx.env = cached_env
 
-        ctx.stlib(
-            source = ctx.path.ant_glob('src/**/*.c'), 
-            target = str(p) + '/gbitmap-tools')
+    ctx.set_group('bundle')
+    ctx.pbl_bundle(includes=ctx.path.ant_glob('include/**/*.h'),
+                   js=ctx.path.ant_glob(['src/js/**/*.js', 'src/js/**/*.json']),
+                   bin_type='lib')
 
-        ctx(rule='cp ${SRC} ${TGT}', source=str(p) + '/libgbitmap-tools.a', target='../delivery/lib/' +str(p) + '/libgbitmap-tools.a')
-
-    ctx(rule='cp ${SRC} ${TGT}', source='src/gbitmap_tools.h', target='../delivery/include/gbitmap_tools.h')
-    
+    if ctx.cmd == 'clean':
+        for n in ctx.path.ant_glob(['dist/**/*', 'dist.zip'], quiet=True):
+            n.delete()

@@ -1,0 +1,32 @@
+{
+  "name": "pebble-gbitmap-lib",
+  "author": "Grégoire Sage",
+  "version": "0.0.0", 
+  "files": [
+    "dist.zip"
+  ],
+  "keywords": [
+    "pebble-package"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gregoiresage/pebble-gbitmap-lib"
+  },
+  "dependencies": {},
+  "pebble": {
+    "projectType": "package",
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "resources": {
+      "media": []
+    },
+    "messageKeys": {}
+  }
+}
