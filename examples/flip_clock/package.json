@@ -1,0 +1,260 @@
+{
+  "version": "1.4.0",
+  "author": "Gregoire Sage",
+  "private": true,
+  "dependencies": {
+    "pebble-gbitmap-lib": "../.."
+  },
+  "keywords": [
+    "pebble-app"
+  ],
+  "pebble": {
+    "sdkVersion": "3",
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_0_UP",
+          "file": "images/month/0_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_0_DOWN",
+          "file": "images/month/0_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_1_UP",
+          "file": "images/month/1_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_1_DOWN",
+          "file": "images/month/1_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_2_UP",
+          "file": "images/month/2_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_2_DOWN",
+          "file": "images/month/2_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_3_UP",
+          "file": "images/month/3_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_3_DOWN",
+          "file": "images/month/3_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_4_UP",
+          "file": "images/month/4_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_4_DOWN",
+          "file": "images/month/4_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_5_UP",
+          "file": "images/month/5_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_5_DOWN",
+          "file": "images/month/5_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_6_UP",
+          "file": "images/month/6_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_6_DOWN",
+          "file": "images/month/6_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_7_UP",
+          "file": "images/month/7_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_7_DOWN",
+          "file": "images/month/7_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_8_UP",
+          "file": "images/month/8_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_8_DOWN",
+          "file": "images/month/8_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_9_UP",
+          "file": "images/month/9_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_9_DOWN",
+          "file": "images/month/9_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_JAN_UP",
+          "file": "images/month/jan_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_JAN_DOWN",
+          "file": "images/month/jan_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_FEB_UP",
+          "file": "images/month/feb_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_FEB_DOWN",
+          "file": "images/month/feb_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MAR_UP",
+          "file": "images/month/mar_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MAR_DOWN",
+          "file": "images/month/mar_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_APR_UP",
+          "file": "images/month/apr_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_APR_DOWN",
+          "file": "images/month/apr_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MAY_UP",
+          "file": "images/month/may_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MAY_DOWN",
+          "file": "images/month/may_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_JUN_UP",
+          "file": "images/month/jun_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_JUN_DOWN",
+          "file": "images/month/jun_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_JUL_UP",
+          "file": "images/month/jul_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_JUL_DOWN",
+          "file": "images/month/jul_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_AUG_UP",
+          "file": "images/month/aug_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_AUG_DOWN",
+          "file": "images/month/aug_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_SEP_UP",
+          "file": "images/month/sep_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_SEP_DOWN",
+          "file": "images/month/sep_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_OCT_UP",
+          "file": "images/month/oct_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_OCT_DOWN",
+          "file": "images/month/oct_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_NOV_UP",
+          "file": "images/month/nov_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_NOV_DOWN",
+          "file": "images/month/nov_down.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_DEC_UP",
+          "file": "images/month/dec_up.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_DEC_DOWN",
+          "file": "images/month/dec_down.png"
+        }
+      ]
+    },
+    "projectType": "native",
+    "uuid": "6401daef-2ed5-4a17-9ee3-b2cde5067834",
+    "messageKeys": {
+      "inverted": 0
+    },
+    "enableMultiJS": false,
+    "displayName": "FlipClock",
+    "watchapp": {
+      "onlyShownOnCommunication": false,
+      "hiddenApp": false,
+      "watchface": true
+    },
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite"
+    ],
+    "capabilities": [
+      "configurable"
+    ]
+  },
+  "name": "FlipClock"
+}
