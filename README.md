@@ -1,12 +1,16 @@
 pebble-gbitmap-lib
 ==================
 
-Source code for a GBitmap tools library for Pebble.
+Resize a GBitmap with this api :
 
-With this library, you will be able to resize any GBitmap dynamically.
+`GBitmap* scaleBitmap(GBitmap* src, uint16_t ratio_width_percent, uint16_t ratio_height_percent)`
 
-Instructions for Use (2 possibilities):
---------------------- 
+Installation
+------------
 
-1. Copy gbitmap_tools.c/.h in your project
-2. Or modify your wscript like in the examples and use directly the compiled library (.a)
+`pebble package install pebble-gbitmap-lib`
+
+Usage
+-----
+
+Add `#include <pebble-gbitmap-lib/gbitmap_tools.h>` in your source file
